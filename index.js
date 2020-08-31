@@ -65,7 +65,7 @@ bot.on('message', message => {
 
             server.queue.push(args[1]);
 
-            if (!message.guild.voice.channel) message.member.voice.channel.join().then((connection) => {
+            if (!message.member.voice.connection) message.member.voice.channel.join().then((connection) => {
                 play(connection, message);
             })
 
