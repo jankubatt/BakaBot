@@ -52,7 +52,7 @@ bot.on('message', message => {
                 return;
             }
 
-            if (!message.member.voiceChannel) {
+            if (!message.member.voice) {
                 message.channel.send("Bez do nejakeho channelu ne?");
                 return;
             }
@@ -65,7 +65,7 @@ bot.on('message', message => {
 
             server.queue.push(args[1]);
 
-            if (!message.guild.voiceChannel) message.member.voiceChannel.join().then((connection) => {
+            if (!message.guild.voice) message.member.voice.join().then((connection) => {
                 play(connection, message);
             })
 
