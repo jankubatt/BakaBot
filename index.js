@@ -37,7 +37,7 @@ bot.on('message', message => {
 
                 server.queue.shift();
 
-                server.dispatcher.on("end", () => {
+                server.dispatcher.on("finish", () => {
                     if (server.queue[0]) {
                         play(connection, message);
                     }
