@@ -1,79 +1,133 @@
-const Discord = require('discord.js');
-const bot = new Discord.Client();
-var ffmpeg = require('ffmpeg');
-const ytdl = require('ytdl-core');
+const Discord = require("discord.js");
+const prefix = "!B";
+const token = "NzQ5NjAwNTY5MTc3NjY5NjMy.X0uV7g.Tna0DF1G-pd440v1Ho42QYllRVg";
+const ytdl = require("ytdl-core");
 
-const token = 'NzQ5NjAwNTY5MTc3NjY5NjMy.X0uV7g.Tna0DF1G-pd440v1Ho42QYllRVg';
+const client = new Discord.Client();
 
-const prefix = '!B'
+const queue = new Map();
 
-var servers = {};
-
-bot.on('ready', () => {
-    console.log('Balin je online');
+client.once("ready", () => {
+  console.log("Balin je online!");
 });
 
-bot.on('message', message => { 
-    let args = message.content.substring(prefix.length).split(" ");
+client.once("reconnecting", () => {
+  console.log("Obnovuji pripojeno!");
+});
 
-    switch(args[0]) {
-        case 'help':
-            message.channel.send("```diff\n+ Prikazy\n- !Bhelp\n- !Binfo\n- !Btest\n```");
-            break;
-        case 'test':
-            message.channel.send('Trivialni panove');
-            break;
+client.once("disconnect", () => {
+  console.log("Odpojuji!");
+});
 
-        case 'info':
-            message.channel.send("```prolog\nBalinBot\n- Bot vytvoren pro ITB Discord\n- Kazdej ho muze upravovat\n```");
-            break;
+client.on("message", async message => {
+  if (message.author.bot) return;
+  if (!message.content.startsWith(prefix)) return;
 
-        case 'play':
+  const serverQueue = queue.get(message.guild.id);
 
-            function play(connection, message) {
-                var server = servers[message.guild.id];
+  if (message.content.startsWith(`${prefix}play`)) {
+    execute(message, serverQueue);
+    return;
+  } else if (message.content.startsWith(`${prefix}skip`)) {
+    skip(message, serverQueue);
+    return;
+  } else if (message.content.startsWith(`${prefix}stop`)) {
+    stop(message, serverQueue);
+    return;
+  } else {
+    message.channel.send("Musis to napsat spravne kriple");
+  }
+});
 
-                server.dispatcher = connection.play(ytdl(server.queue[0], {filter: "audioonly"}));
+async function execute(message, serverQueue) {
+  const args = message.content.split(" ");
 
-                server.queue.shift();
+  const voiceChannel = message.member.voice.channel;
+  if (!voiceChannel)
+    return message.channel.send(
+      "Kamo, jestli chces hudbu, musis jit do voicu"
+    );
+  const permissions = voiceChannel.permissionsFor(message.client.user);
+  if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
+    return message.channel.send(
+      "Nemam prava pico!"
+    );
+  }
 
-                server.dispatcher.on("finish", () => {
-                    if (server.queue[0]) {
-                        play(connection, message);
-                    }
-                    else {
-                        connection.disconnect();
-                    }
-                });
-            }
+  const songInfo = await ytdl.getInfo(args[1]);
+  const song = {
+    title: songInfo.title,
+    url: songInfo.video_url
+  };
 
-            if (!args[1]) {
-                message.channel.send("Daj mne link more!");
-                return;
-            }
+  if (!serverQueue) {
+    const queueContruct = {
+      textChannel: message.channel,
+      voiceChannel: voiceChannel,
+      connection: null,
+      songs: [],
+      volume: 5,
+      playing: true
+    };
 
-            if (!message.member.voice.channel) {
-                message.channel.send("Bez do nejakeho channelu ne?");
-                return;
-            }
+    queue.set(message.guild.id, queueContruct);
 
-            if (!servers[message.guild.id]) servers[message.guild.id] = {
-                queue: []
-            }
+    queueContruct.songs.push(song);
 
-            var server = servers[message.guild.id];
-
-            server.queue.push(args[1]);
-
-            if (!message.member.voice.connection) message.member.voice.channel.join().then((connection) => {
-                play(connection, message);
-            })
-
-            break;
+    try {
+      var connection = await voiceChannel.join();
+      queueContruct.connection = connection;
+      play(message.guild, queueContruct.songs[0]);
+    } catch (err) {
+      console.log(err);
+      queue.delete(message.guild.id);
+      return message.channel.send(err);
     }
-});
+  } else {
+    serverQueue.songs.push(song);
+    return message.channel.send(`${song.title} pridano do rady`);
+  }
+}
 
-bot.login(token);
+function skip(message, serverQueue) {
+  if (!message.member.voice.channel)
+    return message.channel.send(
+      "Kamo, jestli chces hudbu, musis jit do voicu"
+    );
+  if (!serverQueue)
+    return message.channel.send("Neni co more");
+  serverQueue.connection.dispatcher.end();
+}
+
+function stop(message, serverQueue) {
+  if (!message.member.voice.channel)
+    return message.channel.send(
+      "Kamo, jestli chces hudbu, musis jit do voicu"
+    );
+  serverQueue.songs = [];
+  serverQueue.connection.dispatcher.end();
+}
+
+function play(guild, song) {
+  const serverQueue = queue.get(guild.id);
+  if (!song) {
+    serverQueue.voiceChannel.leave();
+    queue.delete(guild.id);
+    return;
+  }
+
+  const dispatcher = serverQueue.connection
+    .play(ytdl(song.url))
+    .on("finish", () => {
+      serverQueue.songs.shift();
+      play(guild, serverQueue.songs[0]);
+    })
+    .on("error", error => console.error(error));
+  dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+  serverQueue.textChannel.send(`Hraje: **${song.title}**`);
+}
+
+client.login(token);
 
 //heroku shit
 const http = require('http');const port = process.env.PORT || 80;const server = http.createServer((req, res) => {res.statusCode = 200;res.setHeader('Content-Type', 'text/html');res.end('BalinBot is running');});server.listen(port,() => {console.log(`Server running at port `+port);});
