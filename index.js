@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
-
+var ffmpeg = require('ffmpeg');
 const ytdl = require('ytdl-core');
 
 const token = 'NzQ5NjAwNTY5MTc3NjY5NjMy.X0uV7g.Tna0DF1G-pd440v1Ho42QYllRVg';
