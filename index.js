@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const prefix = "!B";
+const prefix = "!";
 const token = "NzQ5NjAwNTY5MTc3NjY5NjMy.X0uV7g.Tna0DF1G-pd440v1Ho42QYllRVg";
 const ytdl = require("ytdl-core");
 
@@ -34,6 +34,8 @@ client.on("message", async message => {
   } else if (message.content.startsWith(`${prefix}stop`)) {
     stop(message, serverQueue);
     return;
+  } else if (message.content.startsWith(`${prefix}test`)) {
+    message.channel.send('Trivialni panove');
   } else {
     message.channel.send("Musis to napsat spravne kriple");
   }
