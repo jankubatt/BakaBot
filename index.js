@@ -19,6 +19,8 @@ client.once("disconnect", () => {
   console.log("Odpojuji!");
 });
 
+
+
 client.on("message", async message => {
   if (message.author.bot) return;
   if (!message.content.startsWith(prefix)) return;
@@ -36,6 +38,17 @@ client.on("message", async message => {
     return;
   } else if (message.content.startsWith(`${prefix}test`)) {
     message.channel.send('Trivialni panove');
+  } else if (message.content.startsWith(`${prefix}uptime`)) {
+    let totalSeconds = (client.uptime / 1000);
+    let days = Math.floor(totalSeconds / 86400);
+    totalSeconds %= 86400;
+    let hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = Math.floor(totalSeconds % 60);
+
+    let uptime = `${days} dni, ${hours} hodin, ${minutes} minut a ${seconds} sekund`;
+    message.channel.send('Bezim ' + uptime);
   } else {
     message.channel.send("Musis to napsat spravne kriple");
   }
