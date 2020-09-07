@@ -12,7 +12,7 @@ client.once("ready", () => {
 });
 
 client.once("reconnecting", () => {
-  console.log("Obnovuji pripojeno!");
+  console.log("Obnovuji, připojeno!");
 });
 
 client.once("disconnect", () => {
@@ -35,9 +35,9 @@ client.on("message", async message => {
     stop(message, serverQueue);
     return;
   } else if (message.content.startsWith(`${prefix}test`)) {
-    message.channel.send('Trivialni panove');
+    message.channel.send('Krásný triviální příklad');
   } else {
-    message.channel.send("Musis to napsat spravne kriple");
+    message.channel.send("Jestli to nenapíšeš správně, přestaneš být žákem této školy.");
   }
 });
 
@@ -47,12 +47,12 @@ async function execute(message, serverQueue) {
   const voiceChannel = message.member.voice.channel;
   if (!voiceChannel)
     return message.channel.send(
-      "Kamo, jestli chces hudbu, musis jit do voicu"
+      "Panové, "
     );
   const permissions = voiceChannel.permissionsFor(message.client.user);
   if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
     return message.channel.send(
-      "Nemam prava pico!"
+      "Nemám práva, pánové!"
     );
   }
 
@@ -87,24 +87,24 @@ async function execute(message, serverQueue) {
     }
   } else {
     serverQueue.songs.push(song);
-    return message.channel.send(`${song.title} pridano do rady`);
+    return message.channel.send(`${song.title} přidáno do řady`);
   }
 }
 
 function skip(message, serverQueue) {
   if (!message.member.voice.channel)
     return message.channel.send(
-      "Kamo, jestli chces hudbu, musis jit do voicu"
+      "Jestli chceš hudbu, běž do voice-channelu."
     );
   if (!serverQueue)
-    return message.channel.send("Neni co more");
+    return message.channel.send("Nemám co pustit.");
   serverQueue.connection.dispatcher.end();
 }
 
 function stop(message, serverQueue) {
   if (!message.member.voice.channel)
     return message.channel.send(
-      "Kamo, jestli chces hudbu, musis jit do voicu"
+      "Buď jdi k tabuli nebo do voicu, protože nemám co pouštět."
     );
   serverQueue.songs = [];
   serverQueue.connection.dispatcher.end();
