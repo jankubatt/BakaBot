@@ -28,15 +28,36 @@ client.on("message", async message => {
   if (message.content.startsWith(`${prefix}play`)) {
     execute(message, serverQueue);
     return;
-  } else if (message.content.startsWith(`${prefix}skip`)) {
+  } 
+  
+  else if (message.content.startsWith(`${prefix}skip`)) {
     skip(message, serverQueue);
     return;
-  } else if (message.content.startsWith(`${prefix}stop`)) {
+  }
+  
+  else if (message.content.startsWith(`${prefix}stop`)) {
     stop(message, serverQueue);
     return;
-  } else if (message.content.startsWith(`${prefix}test`)) {
+  } 
+  
+  else if (message.content.startsWith(`${prefix}test`)) {
     message.channel.send('Krásný triviální příklad');
-  } else {
+  }
+  
+  else if (message.content.startsWith(`${prefix}uptime`)) {
+    let totalSeconds = (client.uptime / 1000);
+    let days = Math.floor(totalSeconds / 86400);
+    totalSeconds %= 86400;
+    let hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = Math.floor(totalSeconds % 60);
+
+    let uptime = `${days} dni, ${hours} hodin, ${minutes} minut a ${seconds} sekund`;
+    message.channel.send('Bezim ' + uptime);
+  }
+  
+  else {
     message.channel.send("Jestli to nenapíšeš správně, přestaneš být žákem této školy.");
   }
 });
@@ -49,6 +70,7 @@ async function execute(message, serverQueue) {
     return message.channel.send(
       "Panové, pokud chcete hudbu, běžte do voice channelu. "
     );
+
   const permissions = voiceChannel.permissionsFor(message.client.user);
   if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
     return message.channel.send(
