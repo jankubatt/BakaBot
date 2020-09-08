@@ -19,6 +19,8 @@ client.once("disconnect", () => {
   console.log("Odpojuji!");
 });
 
+
+
 client.on("message", async message => {
   if (message.author.bot) return;
   if (!message.content.startsWith(prefix)) return;
@@ -38,6 +40,7 @@ client.on("message", async message => {
   else if (message.content.startsWith(`${prefix}stop`)) {
     stop(message, serverQueue);
     return;
+<<<<<<< HEAD
   } 
   
   else if (message.content.startsWith(`${prefix}test`)) {
@@ -45,6 +48,11 @@ client.on("message", async message => {
   }
   
   else if (message.content.startsWith(`${prefix}uptime`)) {
+=======
+  } else if (message.content.startsWith(`${prefix}test`)) {
+    message.channel.send('Trivialni panove');
+  } else if (message.content.startsWith(`${prefix}uptime`)) {
+>>>>>>> dce10d598bcf810d38668be6fcb6a57c78a1230b
     let totalSeconds = (client.uptime / 1000);
     let days = Math.floor(totalSeconds / 86400);
     totalSeconds %= 86400;
@@ -55,10 +63,15 @@ client.on("message", async message => {
 
     let uptime = `${days} dni, ${hours} hodin, ${minutes} minut a ${seconds} sekund`;
     message.channel.send('Bezim ' + uptime);
+<<<<<<< HEAD
   }
   
   else {
     message.channel.send("Jestli to nenapíšeš správně, přestaneš být žákem této školy.");
+=======
+  } else {
+    message.channel.send("Musis to napsat spravne kriple");
+>>>>>>> dce10d598bcf810d38668be6fcb6a57c78a1230b
   }
 });
 
