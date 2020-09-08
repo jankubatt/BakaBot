@@ -53,8 +53,8 @@ client.on("message", async message => {
     let minutes = Math.floor(totalSeconds / 60);
     let seconds = Math.floor(totalSeconds % 60);
 
-    let uptime = `${days} dni, ${hours} hodin, ${minutes} minut a ${seconds} sekund`;
-    message.channel.send('Bezim ' + uptime);
+    let uptime = `${days} dní, ${hours} hodin, ${minutes} minut a ${seconds} sekund`;
+    message.channel.send('Pánové, jsem aktivní už' + uptime);
   }
   
   else {
