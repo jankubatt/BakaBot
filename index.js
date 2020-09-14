@@ -19,6 +19,16 @@ client.once("disconnect", () => {
   console.log("Odpojuji!");
 });
 
+// Event listener
+client.on('guildMemberAdd', member => {
+  // Send message to server 
+  const channel = member.guild.channels.cache.find(ch => ch.name === 'welcome');r
+  if (!channel) return;
+  // Send the message, mentioning the member
+  channel.send(`Dobrý den ${member}`);
+});
+
+
 client.on("message", async message => {
   if (message.author.bot) return;
   if (!message.content.startsWith(prefix)) return;
@@ -43,6 +53,13 @@ client.on("message", async message => {
   else if (message.content.startsWith(`${prefix}test`)) {
     message.channel.send('Krásný triviální příklad');
   }
+  else if (message.content.startsWith(`${prefix}help `)) {
+    message.channel.send('!uptime, !play, !skip, !stop');
+  }
+
+else if (message.content.startsWith(`${prefix}test`)) {
+message.channel.send('Krásný triviální příklad')
+}
   
   else if (message.content.startsWith(`${prefix}uptime`)) {
     let totalSeconds = (client.uptime / 1000);
@@ -54,7 +71,7 @@ client.on("message", async message => {
     let seconds = Math.floor(totalSeconds % 60);
 
     let uptime = `${days} dní, ${hours} hodin, ${minutes} minut a ${seconds} sekund`;
-    message.channel.send('Pánové, jsem aktivní už' + uptime);
+    message.channel.send('Pánové, jsem aktivní' + uptime);
   }
   
   else {
