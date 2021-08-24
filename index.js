@@ -53,7 +53,7 @@ client.on("message", async message => {
   else if (message.content.startsWith(`${prefix}test`)) {
     message.channel.send('Krásný triviální příklad');
   }
-  else if (message.content.startsWith(`${prefix}help `)) {
+  else if (message.content.startsWith(`${prefix}help`)) {
     message.channel.send('!uptime, !play, !skip, !stop');
   }
 
