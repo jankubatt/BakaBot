@@ -11,47 +11,47 @@ async def my_background_task():
     await client.wait_until_ready()
     channel = client.get_channel(id=845595321953550337) # replace with channel_id 888015751846441020 
     while not client.is_closed():
-            try:
-                color = (112, 230, 23)
-                found = False
-                webbrowser.open("https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F")
-                time.sleep(10)
-                print("Checking login button")
-                s = pyautogui.screenshot()
-                for x in range(s.width):
-                    if found == True:
+            #try:
+            color = (112, 230, 23)
+            found = False
+            webbrowser.open("https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F")
+            time.sleep(10)
+            print("Checking login button")
+            s = pyautogui.screenshot()
+            for x in range(s.width):
+                if found == True:
+                    break
+                for y in range(s.height):
+                    if s.getpixel((x, y)) == color:
+                        pyautogui.click(x, y)
+                        pyautogui.moveTo(0,0)
+                        found = True
                         break
-                    for y in range(s.height):
-                        if s.getpixel((x, y)) == color:
-                            pyautogui.click(x, y)
-                            pyautogui.moveTo(0,0)
-                            found = True
-                            break
-                            
-                print("done")
-                time.sleep(10)
+                        
+            print("done")
+            time.sleep(10)
 
-                myScreenshot = pyautogui.screenshot(region=(250, 230, 1130, 740))
-                myScreenshot.save(r'/home/bobik666/screenshot.png')
+            myScreenshot = pyautogui.screenshot(region=(250, 230, 1130, 740))
+            myScreenshot.save(r'/home/bobik666/screenshot.png')
 
-                time.sleep(1)
+            time.sleep(1)
 
-                img1 = Image.open('/home/bobik666/screenshot.png')
-                img2 = Image.open('/home/bobik666/screenshot_old.png')
+            img1 = Image.open('/home/bobik666/screenshot.png')
+            img2 = Image.open('/home/bobik666/screenshot_old.png')
 
-                if list(img1.getdata()) == list(img2.getdata()):
-                    print("Identical")
-                else:
-                    print("Different")
-                    await channel.send("Na bakaláře mrdnuli supl píčo. Běž se podívat co skipneš zmrde.")
-                #time.sleep(15)
-                os.remove("/home/bobik666/screenshot_old.png")
-                time.sleep(1)
-                os.rename("/home/bobik666/screenshot.png", "/home/bobik666/screenshot_old.png")
-                #time.sleep()   
+            if list(img1.getdata()) == list(img2.getdata()):
+                print("Identical")
+            else:
+                print("Different")
+                await channel.send("Na bakaláře mrdnuli supl píčo. Běž se podívat co skipneš zmrde.")
+            #time.sleep(15)
+            os.remove("/home/bobik666/screenshot_old.png")
+            time.sleep(1)
+            os.rename("/home/bobik666/screenshot.png", "/home/bobik666/screenshot_old.png")
+            #time.sleep()   
 
-            except Exception as e:
-                print(e)
+            #except Exception as e:
+            #    print(e)
 
             await asyncio.sleep(1)
 
