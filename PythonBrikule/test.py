@@ -1,24 +1,35 @@
-import webbrowser, pyautogui, time
-import sys
-from skimage.transform import resize
-import skimage.measure
-import scipy
+import webbrowser, pyautogui, time, os
 from PIL import Image
+color = (112, 230, 23)
+found = False
 
-#webbrowser.open("https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F")
+webbrowser.open("https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F")
+time.sleep(5)
 
-#time.sleep(3)
+s = pyautogui.screenshot()
+for x in range(s.width):
+    if found == True:
+        break
+    for y in range(s.height):
+        if s.getpixel((x, y)) == color:
+            pyautogui.click(x, y)
+            pyautogui.moveTo(0,0)
+            found = True
+            break
+            
 
-#myScreenshot = pyautogui.screenshot(region=(250, 230, 1130, 740))
-#myScreenshot.save(r'screenshot2.png')
+time.sleep(5)
 
-img_a = Image.open('C:/Users/Honza/Projects/PythonBrikule/screenshot.png')
-img_b = Image.open('C:/Users/Honza/Projects/PythonBrikule/screenshot2.png')
+myScreenshot = pyautogui.screenshot(region=(250, 230, 1130, 740))
+myScreenshot.save(r'C:/Users/Honza/Projects/BalinBot/PythonBrikule/screenshot.png')
 
-# get two images - resize both to 1024 x 1024
-img_a = resize(scipy.imread(sys.argv[1]), (2**10, 2**10))
-img_b = resize(scipy.imread(sys.argv[2]), (2**10, 2**10))
+img1 = Image.open('C:/Users/Honza/Projects/BalinBot/PythonBrikule/screenshot.png')
+img2 = Image.open('C:/Users/Honza/Projects/BalinBot/PythonBrikule/screenshot_old.png')
 
-# score: {-1:1} measure of the structural similarity between the images
-score, diff = skimage.compare_ssim(img_a, img_b, full=True)
-print(score)
+if list(img1.getdata()) == list(img2.getdata()):
+    print("Identical")
+else:
+    print("Different")
+
+os.remove("C:/Users/Honza/Projects/BalinBot/PythonBrikule/screenshot_old.png")
+os.rename("C:/Users/Honza/Projects/BalinBot/PythonBrikule/screenshot.png", "C:/Users/Honza/Projects/BalinBot/PythonBrikule/screenshot_old.png")

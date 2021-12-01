@@ -1,65 +1,54 @@
 # Importing libraries
-import hashlib, time, discord, asyncio, requests
-from urllib.request import urlopen, Request
-from bs4 import BeautifulSoup
+import time, discord, asyncio
+import webbrowser, pyautogui, time, os
+from PIL import Image
 
-# setting the URL you want to monitor
-url = Request('https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F',
-              headers={'User-Agent': 'Mozilla/5.0'})
-
-url = requests.post("https://spsul.bakalari.cz/Login", {
-  "headers": {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-    "accept-language": "en-US,en;q=0.9,cs;q=0.8",
-    "cache-control": "max-age=0",
-    "content-type": "application/x-www-form-urlencoded",
-    "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"",
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": "\"Windows\"",
-    "sec-fetch-dest": "document",
-    "sec-fetch-mode": "navigate",
-    "sec-fetch-site": "same-origin",
-    "sec-fetch-user": "?1",
-    "upgrade-insecure-requests": "1"
-  },
-  "referrer": "https://spsul.bakalari.cz/login?ReturnUrl=/Timetable/Public/Actual/Class/2F",
-  "referrerPolicy": "strict-origin-when-cross-origin",
-  "body": "username=jankubat&password=4Ajs0E8M&returnUrl=%2FTimetable%2FPublic%2FActual%2FClass%2F2F&login=",
-  "method": "POST",
-  "mode": "cors",
-  "credentials": "include"
-})
-
-
-
-soup = BeautifulSoup(url.text, "lxml")
-print(soup)
-
-print(url.history)
-
-response = url
-currentHash = hashlib.sha224(response).hexdigest()
 client = discord.Client()
+
 
 async def my_background_task():
     await client.wait_until_ready()
     channel = client.get_channel(id=845595321953550337) # replace with channel_id 888015751846441020 
     while not client.is_closed():
             try:
+                color = (112, 230, 23)
+                found = False
+                webbrowser.open("https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F")
+                time.sleep(5)
+                print("Checking login button")
+                s = pyautogui.screenshot()
+                for x in range(s.width):
+                    if found == True:
+                        break
+                    for y in range(s.height):
+                        if s.getpixel((x, y)) == color:
+                            pyautogui.click(x, y)
+                            pyautogui.moveTo(0,0)
+                            found = True
+                            break
+                            
+                print("done")
+                time.sleep(5)
+
+                myScreenshot = pyautogui.screenshot(region=(250, 230, 1130, 740))
+                myScreenshot.save(r'C:/Users/Honza/Projects/BalinBot/screenshot.png')
+
                 time.sleep(1)
-                response = urlopen(url).read()
-                currentHash = hashlib.sha224(response).hexdigest()
-                time.sleep(3)
-                response = urlopen(url).read()
-                newHash = hashlib.sha224(response).hexdigest()
-                if newHash != currentHash:
-                    await channel.send("Na bakaláře mrdnuli supl píčo. Běž se podívat co skipneš zmrde.")
-                    response = urlopen(url).read()
-                    currentHash = hashlib.sha224(response).hexdigest()
-                    time.sleep(3)
+
+                img1 = Image.open('C:/Users/Honza/Projects/BalinBot/screenshot.png')
+                img2 = Image.open('C:/Users/Honza/Projects/BalinBot/screenshot_old.png')
+
+                if list(img1.getdata()) == list(img2.getdata()):
+                    print("Identical")
                 else:
-                    print("nic")
-                    
+                    print("Different")
+                    await channel.send("Na bakaláře mrdnuli supl píčo. Běž se podívat co skipneš zmrde.")
+                #time.sleep(15)
+                os.remove("C:/Users/Honza/Projects/BalinBot/screenshot_old.png")
+                time.sleep(1)
+                os.rename("C:/Users/Honza/Projects/BalinBot/screenshot.png", "C:/Users/Honza/Projects/BalinBot/screenshot_old.png")
+                #time.sleep()   
+
             except Exception as e:
                 print(e)
 
