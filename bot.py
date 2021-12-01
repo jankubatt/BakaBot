@@ -3,6 +3,7 @@ import time, discord, asyncio
 import webbrowser, pyautogui, time, os
 from PIL import Image
 
+
 client = discord.Client()
 
 
@@ -14,7 +15,7 @@ async def my_background_task():
                 color = (112, 230, 23)
                 found = False
                 webbrowser.open("https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F")
-                time.sleep(5)
+                time.sleep(10)
                 print("Checking login button")
                 s = pyautogui.screenshot()
                 for x in range(s.width):
@@ -28,15 +29,15 @@ async def my_background_task():
                             break
                             
                 print("done")
-                time.sleep(5)
+                time.sleep(10)
 
                 myScreenshot = pyautogui.screenshot(region=(250, 230, 1130, 740))
-                myScreenshot.save(r'C:/Users/Honza/Projects/BalinBot/screenshot.png')
+                myScreenshot.save(r'/home/bobik666/screenshot.png')
 
                 time.sleep(1)
 
-                img1 = Image.open('C:/Users/Honza/Projects/BalinBot/screenshot.png')
-                img2 = Image.open('C:/Users/Honza/Projects/BalinBot/screenshot_old.png')
+                img1 = Image.open('/home/bobik666/screenshot.png')
+                img2 = Image.open('/home/bobik666/screenshot_old.png')
 
                 if list(img1.getdata()) == list(img2.getdata()):
                     print("Identical")
@@ -44,9 +45,9 @@ async def my_background_task():
                     print("Different")
                     await channel.send("Na bakaláře mrdnuli supl píčo. Běž se podívat co skipneš zmrde.")
                 #time.sleep(15)
-                os.remove("C:/Users/Honza/Projects/BalinBot/screenshot_old.png")
+                os.remove("/home/bobik666/screenshot_old.png")
                 time.sleep(1)
-                os.rename("C:/Users/Honza/Projects/BalinBot/screenshot.png", "C:/Users/Honza/Projects/BalinBot/screenshot_old.png")
+                os.rename("/home/bobik666/screenshot.png", "/home/bobik666/screenshot_old.png")
                 #time.sleep()   
 
             except Exception as e:
