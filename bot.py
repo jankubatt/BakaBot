@@ -62,7 +62,7 @@ async def on_ready():
 
 client.loop.create_task(my_background_task())
 
-client.run('NzQ5NjAwNTY5MTc3NjY5NjMy.X0uV7g.Tna0DF1G-pd440v1Ho42QYllRVg')
+client.run('NzQ5NjAwNTY5MTc3NjY5NjMy.X0uV7g.nFkBhL-FMMD-IpQ9Zw6JaRGyA4k')
 
 
  
