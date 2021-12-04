@@ -16,27 +16,18 @@ async def my_background_task():
             color = (112, 230, 23)
             found = False
             webbrowser.open("https://spsul.bakalari.cz/Timetable/Public/Actual/Class/2F")
-            time.sleep(10)
-            print("Checking login button")
-            s = pyautogui.screenshot()
-            for x in range(s.width):
-                if found == True:
-                    break
-                for y in range(s.height):
-                    if s.getpixel((x, y)) == color:
-                        pyautogui.click(x, y)
-                        pyautogui.moveTo(0,0)
-                        found = True
-                        break
+            pyautogui.moveTo(684, 505)
+            
                         
-            print("done")
+            
+            time.sleep(20)
+            pyautogui.click()
+            pyautogui.moveTo(10,10)
             time.sleep(10)
-
-            myScreenshot = pyautogui.screenshot(region=(250, 230, 1130, 740))
+            myScreenshot = pyautogui.screenshot(region=(150, 150, 900  , 600))
             screenPath = ROOT_DIR + "/screenshot.png"
             myScreenshot.save(screenPath)
 
-            time.sleep(1)
 
             img1 = Image.open(ROOT_DIR + '/screenshot.png')
             img2 = Image.open(ROOT_DIR + '/screenshot_old.png')
@@ -54,8 +45,12 @@ async def my_background_task():
 
             #except Exception as e:
             #    print(e)
-
-            await asyncio.sleep(1)
+            pyautogui.keyDown('ctrl')
+            time.sleep(1)
+            pyautogui.press('w')
+            time.sleep(1)
+            pyautogui.keyUp('ctrl')
+            await asyncio.sleep(3600)
 
 @client.event
 async def on_ready():
