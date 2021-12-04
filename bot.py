@@ -1,5 +1,5 @@
 # Importing libraries
-import time, discord, asyncio, webbrowser, pyautogui, time, os
+import time, discord, asyncio, webbrowser, pyautogui, time, os, shutil
 from PIL import Image
 from datetime import datetime
 
@@ -34,16 +34,17 @@ async def my_background_task():
 
             if list(img1.getdata()) == list(img2.getdata()):
                 print("Identical")
-                os.remove(ROOT_DIR + "/screenshot_old.png")
-                time.sleep(1)
-                os.rename(ROOT_DIR + "/screenshot.png", ROOT_DIR + "/screenshot_old.png")
+                
             else:
                 print("Different")
                 await channel.send("Na bakaláře mrdnuli supl píčo. Běž se podívat co skipneš zmrde.")
                 now = str(datetime.now().time())
-                os.rename(ROOT_DIR + "/screenshot.png", ROOT_DIR + "/screenshot_taken_" + now + ".png")
-                os.rename(ROOT_DIR + "/screenshot_old.png", ROOT_DIR + "/screenshot_taken_" + now + "_old.png")
+                shutil.copy(ROOT_DIR + "/screenshot.png", ROOT_DIR + "/screenshot_taken_" + now + ".png")
+                shutil.copy(ROOT_DIR + "/screenshot_old.png", ROOT_DIR + "/screenshot_taken_" + now + "_old.png")
 
+            os.remove(ROOT_DIR + "/screenshot_old.png")
+            time.sleep(1)
+            os.rename(ROOT_DIR + "/screenshot.png", ROOT_DIR + "/screenshot_old.png")
             time.sleep(1)
             pyautogui.keyDown('ctrl')
             time.sleep(1)
