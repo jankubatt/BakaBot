@@ -40,7 +40,7 @@ async def my_background_task():
             else:
                 print("Different")
                 await channel.send("Na bakaláře mrdnuli supl píčo. Běž se podívat co skipneš zmrde.")
-                now = datetime.now().time()
+                now = str(datetime.now().time())
                 os.rename(ROOT_DIR + "/screenshot.png", ROOT_DIR + "/screenshot_taken_" + now + ".png")
                 os.rename(ROOT_DIR + "/screenshot_old.png", ROOT_DIR + "/screenshot_taken_" + now + "_old.png")
 
