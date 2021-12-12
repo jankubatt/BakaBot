@@ -1,0 +1,28 @@
+{
+  "name": "balinbot",
+  "version": "1.0.0",
+  "description": "Bot that check for substitution",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jankubatt/BalinBot.git"
+  },
+  "author": "Jan Kubat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jankubatt/BalinBot/issues"
+  },
+  "homepage": "https://github.com/jankubatt/BalinBot#readme",
+  "dependencies": {
+    "@discordjs/builders": "^0.9.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "discord-api-types": "^0.25.2",
+    "discord.js": "^13.3.1",
+    "image-diff": "^2.0.0",
+    "looks-same": "^7.3.0",
+    "puppeteer": "^12.0.1"
+  }
+}
