@@ -2,6 +2,7 @@ const { Client, Intents } = require('discord.js');
 const looksSame = require('looks-same');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
+const jimp = require('jimp');
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
@@ -25,6 +26,9 @@ async function checkSupl() {
     ])
     await page.screenshot({ path: 'screenshot.png' });
 
+    const image = await jimp.read('screenshot.png');
+    await image.greyscale().write("screenshot.png");
+
     await looksSame('screenshot.png', 'screenshot_old.png', function(error, {equal}) {
       	if (equal) {
         	console.log("Same");
@@ -32,7 +36,7 @@ async function checkSupl() {
       	else {
         	console.log("different");
         	const channel = client.channels.cache.get('845595321953550337');
-      		channel.send('SUPL PICO');
+      		channel.send('@everyone Na bakalarich je supl');
       	}
     });
 
@@ -43,6 +47,8 @@ async function checkSupl() {
 
 client.on('ready', () => {
   	console.log(`client ${client.user.tag} is logged in!`);
+
+    checkSupl();
 
   	setInterval(() => {
     	checkSupl();

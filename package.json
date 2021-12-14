@@ -22,6 +22,7 @@
     "discord-api-types": "^0.25.2",
     "discord.js": "^13.3.1",
     "image-diff": "^2.0.0",
+    "jimp": "^0.16.1",
     "looks-same": "^7.3.0",
     "puppeteer": "^12.0.1"
   }
