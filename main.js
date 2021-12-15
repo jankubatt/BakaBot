@@ -26,10 +26,10 @@ async function checkSupl() {
     ])
     await page.screenshot({ path: 'screenshot.png' });
 
-    const image = await jimp.read('screenshot.png');
-    await image.greyscale().write("screenshot.png");
+    //const image = await jimp.read('screenshot.png');
+    //await image.greyscale().write("screenshot.png");
 
-    await looksSame('screenshot.png', 'screenshot_old.png', function(error, {equal}) {
+    await looksSame('screenshot.png', 'screenshot_old.png', {tolerance: 50}, function(error, {equal}) {
       	if (equal) {
         	console.log("Same");
       	}
@@ -42,6 +42,7 @@ async function checkSupl() {
 
     fs.unlinkSync("screenshot_old.png");
     fs.renameSync("screenshot.png", "screenshot_old.png")
+
     await browser.close();
 }
 
