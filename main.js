@@ -2,7 +2,6 @@ const { Client, Intents } = require('discord.js');
 const looksSame = require('looks-same');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const jimp = require('jimp');
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
@@ -26,10 +25,7 @@ async function checkSupl() {
     ])
     await page.screenshot({ path: 'screenshot.png' });
 
-    //const image = await jimp.read('screenshot.png');
-    //await image.greyscale().write("screenshot.png");
-
-    await looksSame('screenshot.png', 'screenshot_old.png', {tolerance: 50}, function(error, {equal}) {
+    await looksSame('screenshot.png', 'screenshot_old.png', {tolerance: 25}, function(error, {equal}) {
       	if (equal) {
         	console.log("Same");
       	}
@@ -57,5 +53,5 @@ client.on('ready', () => {
 });
 
 client.login('NzQ5NjAwNTY5MTc3NjY5NjMy.X0uV7g.nFkBhL-FMMD-IpQ9Zw6JaRGyA4k').then(() => {
-  	client.user.setPresence({ activities: [{ name: 'supl na bakalarich', type: 'WATCHING' }], status: 'online' });
+  	client.user.setPresence({ activities: [{ name: 'Suplování', type: 'WATCHING' }], status: 'online' });
 });
