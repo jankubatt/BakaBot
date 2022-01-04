@@ -1,7 +1,8 @@
 const { Client, Intents } = require('discord.js');
-const looksSame = require('looks-same');
-const fs = require('fs');
 const puppeteer = require('puppeteer');
+
+let count = 0;
+let previousCount = 0;
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
@@ -19,25 +20,22 @@ async function checkSupl() {
         document.querySelector('input[id="password"]').value = "4Ajs0E8M";
     });
     
+    
     await Promise.all([
         page.click('button.btn-login'),
         page.waitForNavigation({waitUntil: 'networkidle2'})
     ])
-    await page.screenshot({ path: 'screenshot.png' });
 
-    await looksSame('screenshot.png', 'screenshot_old.png', {tolerance: 25}, function(error, {equal}) {
-      	if (equal) {
-        	console.log("Same");
-      	}
-      	else {
-        	console.log("different");
-        	const channel = client.channels.cache.get('845595321953550337');
-      		channel.send('@everyone Na bakalarich je supl');
-      	}
-    });
+    const data = await page.evaluate(() => document.querySelector('*').outerHTML);
 
-    fs.unlinkSync("screenshot_old.png");
-    fs.renameSync("screenshot.png", "screenshot_old.png")
+    count = (data.match(/pink/g) || []).length;
+
+    if (count != previousCount) {
+        const channel = client.channels.cache.get('845595321953550337');
+        channel.send('<@&928010721290244156>\nNové suplování bylo přidáno na Bakaláře');
+    }
+
+    previousCount = count;
 
     await browser.close();
 }
