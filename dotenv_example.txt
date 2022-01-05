@@ -1,0 +1,6 @@
+BakaURL=
+BakaPass=
+BakaUser=
+BotToken=
+ChannelID=
+RoleID=
