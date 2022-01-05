@@ -1,25 +1,24 @@
 {
-  "name": "balinbot",
+  "name": "bakabot",
   "version": "1.0.0",
-  "description": "Bot that check for substitution",
+  "description": "Bot that checks for substitution",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jankubatt/BalinBot.git"
+    "url": "git+https://github.com/jankubatt/BakaBot.git"
   },
   "author": "Jan Kubat",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jankubatt/BalinBot/issues"
+    "url": "https://github.com/jankubatt/BakaBot/issues"
   },
-  "homepage": "https://github.com/jankubatt/BalinBot#readme",
+  "homepage": "https://github.com/jankubatt/BakaBot#readme",
   "dependencies": {
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
-    "looks-same": "^7.3.0",
     "puppeteer": "^12.0.1"
   }
 }
