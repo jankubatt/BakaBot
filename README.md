@@ -9,4 +9,4 @@ Looks for new substitution in your timetable
 2. Configure .env file
 3. node main.js
 
-![bot1](https://github.com/jankubatt/BalinBot/blob/master/bot.png)
+![bot1](https://github.com/jankubatt/BakaBot/blob/master/bot.png)
