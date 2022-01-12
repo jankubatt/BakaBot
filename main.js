@@ -59,7 +59,7 @@ client.on('ready', () => {
 
   	setInterval(() => {
     	checkSupl();
-  	}, 1000*60)
+  	}, 1000*60*60)
 });
 
 client.login(BotToken).then(() => {
