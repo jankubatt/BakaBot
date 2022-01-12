@@ -42,7 +42,10 @@ async function checkSupl() {
     if (count != previousCount) {
         const channel = client.channels.cache.get(ChannelID);
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
+        console.log("New");
     }
+    else
+        console.log("Same");
 
     previousCount = count;
 
@@ -56,7 +59,7 @@ client.on('ready', () => {
 
   	setInterval(() => {
     	checkSupl();
-  	}, 1000*60*60)
+  	}, 1000*60)
 });
 
 client.login(BotToken).then(() => {
