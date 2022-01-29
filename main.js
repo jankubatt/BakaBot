@@ -37,15 +37,17 @@ async function checkSupl() {
 
     const data = await page.evaluate(() => document.querySelector('*').outerHTML);
 
-    count = (data.match(/pink/g) || []).length;
+    if (new Date().getHours == 0) {
+        previousCount = count;
+    }
+    else {
+        count = (data.match(/pink/g) || []).length;
+    }
 
     if (count != previousCount) {
         const channel = client.channels.cache.get(ChannelID);
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
-        console.log("New");
     }
-    else
-        console.log("Same");
 
     previousCount = count;
 
