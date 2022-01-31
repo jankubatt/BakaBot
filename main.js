@@ -13,6 +13,7 @@ const RoleID = process.env.RoleID;          //ID of role that should be notified
 
 let count = 0;
 let previousCount = 0;
+let classes = "";
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
@@ -35,18 +36,36 @@ async function checkSupl() {
         page.waitForNavigation({waitUntil: 'networkidle2'})
     ])
 
-    const data = await page.evaluate(() => document.querySelector('*').outerHTML);
+    let data = await page.evaluate(() => document.querySelector('*').outerHTML);
 
     if (new Date().getHours == 0) {
         previousCount = count;
     }
     else {
         count = (data.match(/pink/g) || []).length;
+        classes = "";
+        data = data.split(/pink/g);
+        data.shift();
+
+        data.forEach(element => {
+            let point = getPosition(element, "-", 2);
+            let after = element.substring(point, element.length);
+            let before = element.substring(0, point);
+
+            let beforeIndex = before.lastIndexOf(";")+1;
+            let afterIndex = after.search("&quot;");
+
+            after = after.substring(afterIndex, -1);
+            before = before.substring(beforeIndex, before.length);
+
+            let text = before + after;
+            classes += text + "\n";
+        });
     }
 
     if (count != previousCount) {
         const channel = client.channels.cache.get(ChannelID);
-        channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
+        channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře\n-----------------------------------------------\n${classes}`);
     }
 
     previousCount = count;
@@ -67,3 +86,7 @@ client.on('ready', () => {
 client.login(BotToken).then(() => {
   	client.user.setPresence({ activities: [{ name: 'Suplování', type: 'WATCHING' }], status: 'online' });
 });
+
+function getPosition(string, subString, index) {
+    return string.split(subString, index).join(subString).length;
+}
