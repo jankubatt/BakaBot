@@ -72,7 +72,7 @@ async function checkSupl() {
 
         //Format all substitute data
         data.forEach(element => {
-            let point = getPosition(element, "-", 2);
+            let point = element.search(" - ");
             let after = element.substring(point, element.length);
             let before = element.substring(0, point);
 
@@ -83,6 +83,11 @@ async function checkSupl() {
             before = before.substring(beforeIndex, before.length);
 
             let text = before + after;
+
+            if ((text.match(/\|/g) || []).length == 1) {
+                text = "Hodina přesunuta | " + text;
+            }
+
             classes += text + "\n";
         });
         
@@ -92,7 +97,7 @@ async function checkSupl() {
     if (count != previousCount && previousCount != -1) {
         logger.info("Sending message");
         const channel = client.channels.cache.get(ChannelID);
-        channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře\n-----------------------------------------------\n${classes}`);
+        channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
     }
 
     previousCount = count;
@@ -110,10 +115,14 @@ client.on('ready', () => {
     }, 1000 * 60 * 60)
 });
 
-client.login(BotToken).then(() => {
-    client.user.setPresence({ activities: [{ name: 'Suplování', type: 'WATCHING' }], status: 'online' });
-});
+client.on('messageCreate', (message) => {
+    if (message.content === "/suplinfo") {
+        message.reply({
+            content: classes
+        })
+    }
+  });
 
-function getPosition(string, subString, index) {
-    return string.split(subString, index).join(subString).length;
-}
+client.login(BotToken).then(() => {
+    client.user.setPresence({ activities: [{ name: 'Suplování /suplinfo', type: 'WATCHING' }], status: 'online' });
+});
