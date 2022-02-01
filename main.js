@@ -11,48 +11,53 @@ const BotToken = process.env.BotToken;      //Discord bot token
 const ChannelID = process.env.ChannelID;    //ID of channel you want to send notifications to
 const RoleID = process.env.RoleID;          //ID of role that should be notified
 
-let count = 0;
-let previousCount = 0;
-let classes = "";
+let count = 0;          //number of substituted classes
+let previousCount = -1;  //previous number of substituted classes
+let classes = "";       //Substituted classes
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
 });
 
 async function checkSupl() {
-  	const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
     const url = BakaURL;
-    
-	await page.setViewport({ width: 1920, height: 1080 })
+
+    //Login
+    await page.setViewport({ width: 1920, height: 1080 })
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.evaluate((User, Pass) => {
         document.querySelector('input[id="username"]').value = User;
         document.querySelector('input[id="password"]').value = Pass;
     }, BakaUser, BakaPass);
-    
+
     await Promise.all([
         page.click('button.btn-login'),
-        page.waitForNavigation({waitUntil: 'networkidle2'})
+        page.waitForNavigation({ waitUntil: 'networkidle2' })
     ])
 
+    //Get page data
     let data = await page.evaluate(() => document.querySelector('*').outerHTML);
+    let date = new Date();
 
-    if (new Date().getHours == 0) {
+    if (date.getHours == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
         previousCount = count;
     }
     else {
-        count = (data.match(/pink/g) || []).length;
+        count = (data.match(/pink/g) || []).length; //count all substituted classes
+
         classes = "";
         data = data.split(/pink/g);
         data.shift();
 
+        //Format all substitute data
         data.forEach(element => {
             let point = getPosition(element, "-", 2);
             let after = element.substring(point, element.length);
             let before = element.substring(0, point);
 
-            let beforeIndex = before.lastIndexOf(";")+1;
+            let beforeIndex = before.lastIndexOf(";") + 1;
             let afterIndex = after.search("&quot;");
 
             after = after.substring(afterIndex, -1);
@@ -63,7 +68,7 @@ async function checkSupl() {
         });
     }
 
-    if (count != previousCount) {
+    if (count != previousCount && previousCount != -1) {
         const channel = client.channels.cache.get(ChannelID);
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře\n-----------------------------------------------\n${classes}`);
     }
@@ -74,17 +79,17 @@ async function checkSupl() {
 }
 
 client.on('ready', () => {
-  	console.log(`Client ${client.user.tag} is logged in!`);
+    console.log(`Client ${client.user.tag} is logged in!`);
 
     checkSupl();
 
-  	setInterval(() => {
-    	checkSupl();
-  	}, 1000*60*60)
+    setInterval(() => {
+        checkSupl();
+    }, 1000 * 60 * 60)
 });
 
 client.login(BotToken).then(() => {
-  	client.user.setPresence({ activities: [{ name: 'Suplování', type: 'WATCHING' }], status: 'online' });
+    client.user.setPresence({ activities: [{ name: 'Suplování', type: 'WATCHING' }], status: 'online' });
 });
 
 function getPosition(string, subString, index) {
