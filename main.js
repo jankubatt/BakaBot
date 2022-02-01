@@ -3,6 +3,23 @@ const puppeteer = require('puppeteer');
 const dotenv = require('dotenv');
 dotenv.config();
 
+const { createLogger, format, transports } = require("winston");
+
+const logLevels = {
+    fatal: 0,
+    error: 1,
+    warn: 2,
+    info: 3,
+    debug: 4,
+    trace: 5,
+};
+  
+const logger = createLogger({
+    levels: logLevels,
+    format: format.combine(format.timestamp(), format.json()),
+    transports: [new transports.Console()],
+});
+
 //Environmental variables, see .env example
 const BakaURL = process.env.BakaURL;        //URL to your Bakalari Timetable (https://YOUR_SCHOOL.bakalari.cz/login?ReturnUrl=/Timetable/Public/Actual/Class/YOUR_CLASS)
 const BakaUser = process.env.BakaUser;      //Your username
@@ -20,12 +37,12 @@ const client = new Client({
 });
 
 async function checkSupl() {
+    logger.info("Checking substitutions");
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     const url = BakaURL;
 
     //Login
-    await page.setViewport({ width: 1920, height: 1080 })
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.evaluate((User, Pass) => {
         document.querySelector('input[id="username"]').value = User;
@@ -43,8 +60,10 @@ async function checkSupl() {
 
     if (date.getHours == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
         previousCount = count;
+        logger.info("It's monday midnight. Not checking.");
     }
     else {
+        logger.info("Processing data");
         count = (data.match(/pink/g) || []).length; //count all substituted classes
 
         classes = "";
@@ -66,9 +85,12 @@ async function checkSupl() {
             let text = before + after;
             classes += text + "\n";
         });
+        
+        logger.info("Done processing data");
     }
 
     if (count != previousCount && previousCount != -1) {
+        logger.info("Sending message");
         const channel = client.channels.cache.get(ChannelID);
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře\n-----------------------------------------------\n${classes}`);
     }
@@ -79,7 +101,7 @@ async function checkSupl() {
 }
 
 client.on('ready', () => {
-    console.log(`Client ${client.user.tag} is logged in!`);
+    logger.info(`Client ${client.user.tag} is logged in!`);
 
     checkSupl();
 
