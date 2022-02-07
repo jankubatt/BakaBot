@@ -59,7 +59,7 @@ async function checkSupl() {
     let date = new Date();
 
     if (date.getHours == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
-        previousCount = count;
+        count = previousCount;
         logger.info("It's monday midnight. Not checking.");
     }
     else {
