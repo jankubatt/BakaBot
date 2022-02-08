@@ -112,7 +112,7 @@ client.on('ready', () => {
 
     setInterval(() => {
         checkSupl();
-    }, 1000 * 60 * 60)
+    }, 1000 * 60 * 10)
 });
 
 client.on('messageCreate', (message) => {
