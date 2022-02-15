@@ -58,8 +58,9 @@ async function checkSupl() {
     let data = await page.evaluate(() => document.querySelector('*').outerHTML);
     let date = new Date();
 
-    if (date.getHours == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
-        count = previousCount;
+    if (date.getHours == 21 && date.getDay() == 2) { //If it's midnight on Monday (Changing of timetables), reset previous count
+        count = 0;
+        previousCount = 0;
         classes = "";
         logger.info("It's monday midnight. Not checking.");
     }
@@ -163,7 +164,7 @@ client.on('ready', () => {
     //Interval for regular checking
     setInterval(() => {
         checkSupl();
-    }, 1000 * 60 * 60)
+    }, 1000 * 60 * 5)
 });
 
 client.on('messageCreate', (message) => {
