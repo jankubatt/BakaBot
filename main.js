@@ -1,4 +1,4 @@
-const { Client, Intents } = require('discord.js');
+const { Client, Intents, MessageAttachment, MessageEmbed } = require('discord.js');
 const puppeteer = require('puppeteer');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -38,7 +38,7 @@ const client = new Client({
 
 async function checkSupl() {
     logger.info("Checking substitutions");
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({defaultViewport: { width: 1920, height: 1080 }});
     const page = await browser.newPage();
     const url = BakaURL;
 
@@ -57,6 +57,11 @@ async function checkSupl() {
     //Get page data
     let data = await page.evaluate(() => document.querySelector('*').outerHTML);
     let date = new Date();
+
+    const timetable = await page.$('#main');        // logo is the element you want to capture
+    await timetable.screenshot({
+        path: 'timetable.png'
+    });
 
     if (date.getHours() == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
         previousCount = -1;
@@ -98,7 +103,9 @@ async function checkSupl() {
     if (count != previousCount && previousCount != -1) {
         logger.info("Sending message");
         const channel = client.channels.cache.get(ChannelID);
+        const file = new MessageAttachment('./timetable.png');
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
+        channel.send({ files: [file] });
     }
 
     previousCount = count;
@@ -163,13 +170,13 @@ client.on('ready', () => {
     //Interval for regular checking
     setInterval(() => {
         checkSupl();
-    }, 1000 * 60 * 5)
+    }, 1000 * 60 * 10)
 });
 
 client.on('messageCreate', (message) => {
     if (message.content === "/suplinfo") {
         message.reply({
-            content: classes
+            content: ((classes == "") ? "Nic" : classes)
         })
     }
   });
