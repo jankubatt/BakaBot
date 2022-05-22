@@ -1,24 +1,17 @@
-const { Client, Intents, MessageAttachment, MessageEmbed } = require('discord.js');
-const puppeteer = require('puppeteer');
+/*
+SETUP
+ */
+
+//CONSTANTS
+const { Client, Intents } = require('discord.js');
 const dotenv = require('dotenv');
+const he = require("he");
 dotenv.config();
 
-const { createLogger, format, transports } = require("winston");
-
-const logLevels = {
-    fatal: 0,
-    error: 1,
-    warn: 2,
-    info: 3,
-    debug: 4,
-    trace: 5,
-};
-  
-const logger = createLogger({
-    levels: logLevels,
-    format: format.combine(format.timestamp(), format.json()),
-    transports: [new transports.Console()],
-});
+//VARIABLES
+let accessToken;
+let oldTimetable = [];
+let timetable = [];
 
 //Environmental variables, see .env example
 const BakaURL = process.env.BakaURL;        //URL to your Bakalari Timetable (https://YOUR_SCHOOL.bakalari.cz/login?ReturnUrl=/Timetable/Public/Actual/Class/YOUR_CLASS)
@@ -28,159 +21,158 @@ const BotToken = process.env.BotToken;      //Discord bot token
 const ChannelID = process.env.ChannelID;    //ID of channel you want to send notifications to
 const RoleID = process.env.RoleID;          //ID of role that should be notified
 
-let count = 0;          //number of substituted classes
-let previousCount = -1;  //previous number of substituted classes
-let classes = "";       //Substituted classes
+//LOGGER
+const { createLogger, format, transports } = require("winston");
+const logLevels = {
+    fatal: 0,
+    error: 1,
+    warn: 2,
+    info: 3,
+    debug: 4,
+    trace: 5,
+};
+const logger = createLogger({
+    levels: logLevels,
+    format: format.combine(format.timestamp(), format.json()),
+    transports: [new transports.Console()],
+});
 
+//AXIOS
+const axios = require("axios");
+const qs = require("qs");
+const requestData = qs.stringify({
+  "username": BakaUser,
+  "password": BakaPass,
+  "returnUrl": "/Timetable/Public/Actual/Class/2F",
+  "login": "" 
+});
+
+//CLIENT
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
 });
 
-async function checkSupl() {
-    logger.info("Checking substitutions");
-    const browser = await puppeteer.launch({defaultViewport: { width: 1920, height: 1080 }});
-    const page = await browser.newPage();
-    const url = BakaURL;
+/*
+FUNCTIONS
+ */
 
-    //Login
-    await page.goto(url, { waitUntil: 'networkidle0' });
-    await page.evaluate((User, Pass) => {
-        document.querySelector('input[id="username"]').value = User;
-        document.querySelector('input[id="password"]').value = Pass;
-    }, BakaUser, BakaPass);
+//Gets Bakalaris access token for login credentials
+function getAccessToken(){
+    logger.info(`Getting access token`);
 
-    await Promise.all([
-        page.click('button.btn-login'),
-        page.waitForNavigation({ waitUntil: 'networkidle2' })
-    ])
-
-    //Get page data
-    let data = await page.evaluate(() => document.querySelector('*').outerHTML);
-    let date = new Date();
-
-    const timetable = await page.$('#main');        // logo is the element you want to capture
-    await timetable.screenshot({
-        path: 'timetable.png'
+    axios({
+        method: "POST",
+        url: "https://spsul.bakalari.cz/api/login",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        data: `client_id=ANDR&grant_type=password&username=${BakaUser}&password=${BakaPass}`
+    }).then((res) => {
+        accessToken = res.data.access_token;
     });
+}
 
-    if (date.getHours() == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
-        previousCount = -1;
-        classes = "";
-        logger.info("It's monday midnight. Not checking.");
-    }
-    else {
-        logger.info("Processing data");
-        count = (data.match(/pink/g) || []).length; //count all substituted classes
+//Gets timetable data
+function getTimetable(accessToken) {
+    logger.info(`Getting timetable data`);
 
-        classes = "";
-        data = data.split(/pink/g);
-        data.shift();
+    axios({
+        method: "GET",
+        url: process.env.BakaURL,
+        headers: {"Authorization": `Bearer ${accessToken}`},
+        data: requestData
+    }).then(function (res) {
+        let data = res.data;   //Store data
+        data = he.decode(data); //Decode data, that means translate html characters to normal ones
+        data = data.split(`<div class="bk-timetable-cell"`);    //split it based on timetable cell
+        data.shift();   //remove first element from array because its just html code that we don't want
 
-        //Format all substitute data
+        //Goes through all elements and fetches a json object from specified cell of bakalaris timetable
         data.forEach(element => {
-            let point = element.search(" - ");
-            let after = element.substring(point, element.length);
-            let before = element.substring(0, point);
+            if (element.substring(element.indexOf("{"), element.indexOf("}")+1) != "") {
+                element = element.substring(element.indexOf("{"), element.indexOf("}")+1);
+                element = JSON.parse(element);
 
-            let beforeIndex = before.lastIndexOf(";") + 1;
-            let afterIndex = after.search("&quot;");
-
-            after = after.substring(afterIndex, -1);
-            before = before.substring(beforeIndex, before.length);
-
-            let text = before + after;
-
-            if ((text.match(/\|/g) || []).length == 1) {
-                text = "Hodina přesunuta | " + text;
+                timetable.push(element);
             }
-
-            classes += text + "\n";
         });
-        
-        logger.info("Done processing data");
-    }
+    });
+}
 
-    if (count != previousCount && previousCount != -1) {
+//Checks for substitution
+async function checkSubstitution() {
+    logger.info(`Checking substitutions`);
+
+    await getAccessToken();
+    await getTimetable(accessToken);
+
+    if (timetable !== oldTimetable && oldTimetable.length > 0) {
         logger.info("Sending message");
         const channel = client.channels.cache.get(ChannelID);
-        const file = new MessageAttachment('./timetable.png');
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
-        channel.send({ files: [file] });
     }
 
-    previousCount = count;
-
-    await browser.close();
+    oldTimetable = timetable;
 }
 
 client.on('ready', () => {
     logger.info(`Client ${client.user.tag} is logged in!`);
 
-    checkSupl();
+    checkSubstitution();
 
     //Interval for break checking (Edit this, if you have different times of breaks in school)
     setInterval(() => {
         let date = new Date();
 
         if (date.getHours() == 8 && date.getMinutes() == 0) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 8 && date.getMinutes() == 45) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 8 && date.getMinutes() == 55) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 9 && date.getMinutes() == 40) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 9 && date.getMinutes() == 50) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 10 && date.getMinutes() == 35) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 10 && date.getMinutes() == 50) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 11 && date.getMinutes() == 35) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 11 && date.getMinutes() == 45) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 12 && date.getMinutes() == 30) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 12 && date.getMinutes() == 40) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 13 && date.getMinutes() == 25) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 13 && date.getMinutes() == 35) {
-            checkSupl();
+            checkSubstitution();
         }
         else if (date.getHours() == 14 && date.getMinutes() == 20) {
-            checkSupl();
+            checkSubstitution();
         }
 
-    }, 1000 * 60 * 2.5)
+    }, 1000 * 60 * 5)
 
     //Interval for regular checking
     setInterval(() => {
-        checkSupl();
+        checkSubstitution();
     }, 1000 * 60 * 10)
 });
 
-client.on('messageCreate', (message) => {
-    if (message.content === "/suplinfo") {
-        message.reply({
-            content: ((classes == "") ? "Nic" : classes)
-        })
-    }
-  });
-
 client.login(BotToken).then(() => {
-    client.user.setPresence({ activities: [{ name: 'Suplování /suplinfo', type: 'WATCHING' }], status: 'online' });
+    client.user.setPresence({ activities: [{ name: 'Suplování', type: 'WATCHING' }], status: 'online' });
 });
