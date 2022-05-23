@@ -87,7 +87,7 @@ function getTimetable(accessToken) {
 
         //Goes through all elements and fetches a json object from specified cell of bakalaris timetable
         data.forEach(element => {
-            if (element.substring(element.indexOf("{"), element.indexOf("}")+1) != "") {
+            if (element.substring(element.indexOf("{"), element.indexOf("}")+1) !== "") {
                 element = element.substring(element.indexOf("{"), element.indexOf("}")+1);
                 element = JSON.parse(element);
 
@@ -115,6 +115,7 @@ async function checkSubstitution() {
 
 client.on('ready', () => {
     logger.info(`Client ${client.user.tag} is logged in!`);
+    test();
 
     checkSubstitution();
 
@@ -122,46 +123,46 @@ client.on('ready', () => {
     setInterval(() => {
         let date = new Date();
 
-        if (date.getHours() == 8 && date.getMinutes() == 0) {
+        if (date.getHours() === 8 && date.getMinutes() === 0) {
             checkSubstitution();
         }
-        else if (date.getHours() == 8 && date.getMinutes() == 45) {
+        else if (date.getHours() === 8 && date.getMinutes() === 45) {
             checkSubstitution();
         }
-        else if (date.getHours() == 8 && date.getMinutes() == 55) {
+        else if (date.getHours() === 8 && date.getMinutes() === 55) {
             checkSubstitution();
         }
-        else if (date.getHours() == 9 && date.getMinutes() == 40) {
+        else if (date.getHours() === 9 && date.getMinutes() === 40) {
             checkSubstitution();
         }
-        else if (date.getHours() == 9 && date.getMinutes() == 50) {
+        else if (date.getHours() === 9 && date.getMinutes() === 50) {
             checkSubstitution();
         }
-        else if (date.getHours() == 10 && date.getMinutes() == 35) {
+        else if (date.getHours() === 10 && date.getMinutes() === 35) {
             checkSubstitution();
         }
-        else if (date.getHours() == 10 && date.getMinutes() == 50) {
+        else if (date.getHours() === 10 && date.getMinutes() === 50) {
             checkSubstitution();
         }
-        else if (date.getHours() == 11 && date.getMinutes() == 35) {
+        else if (date.getHours() === 11 && date.getMinutes() === 35) {
             checkSubstitution();
         }
-        else if (date.getHours() == 11 && date.getMinutes() == 45) {
+        else if (date.getHours() === 11 && date.getMinutes() === 45) {
             checkSubstitution();
         }
-        else if (date.getHours() == 12 && date.getMinutes() == 30) {
+        else if (date.getHours() === 12 && date.getMinutes() === 30) {
             checkSubstitution();
         }
-        else if (date.getHours() == 12 && date.getMinutes() == 40) {
+        else if (date.getHours() === 12 && date.getMinutes() === 40) {
             checkSubstitution();
         }
-        else if (date.getHours() == 13 && date.getMinutes() == 25) {
+        else if (date.getHours() === 13 && date.getMinutes() === 25) {
             checkSubstitution();
         }
-        else if (date.getHours() == 13 && date.getMinutes() == 35) {
+        else if (date.getHours() === 13 && date.getMinutes() === 35) {
             checkSubstitution();
         }
-        else if (date.getHours() == 14 && date.getMinutes() == 20) {
+        else if (date.getHours() === 14 && date.getMinutes() === 20) {
             checkSubstitution();
         }
 
@@ -170,7 +171,7 @@ client.on('ready', () => {
     //Interval for regular checking
     setInterval(() => {
         checkSubstitution();
-    }, 1000 * 60 * 10)
+    }, 1000 * 60 * 0.5)
 });
 
 client.login(BotToken).then(() => {
