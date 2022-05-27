@@ -43,7 +43,6 @@ const qs = require("qs");
 const requestData = qs.stringify({
   "username": BakaUser,
   "password": BakaPass,
-  "returnUrl": "/Timetable/Public/Actual/Class/2F",
   "login": "" 
 });
 
@@ -76,7 +75,7 @@ function getTimetable(accessToken) {
 
     axios({
         method: "GET",
-        url: process.env.BakaURL,
+        url: BakaURL,
         headers: {"Authorization": `Bearer ${accessToken}`},
         data: requestData
     }).then(function (res) {
@@ -99,10 +98,10 @@ function getTimetable(accessToken) {
 
 //Checks for substitution
 async function checkSubstitution() {
-    logger.info(`Checking substitutions`);
-
     await getAccessToken();
     await getTimetable(accessToken);
+
+    logger.info(`Checking substitutions`);
 
     if (timetable !== oldTimetable && oldTimetable.length > 0) {
         logger.info("Sending message");
@@ -110,12 +109,13 @@ async function checkSubstitution() {
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
     }
 
+    logger.info(`Done`);
+
     oldTimetable = timetable;
 }
 
 client.on('ready', () => {
     logger.info(`Client ${client.user.tag} is logged in!`);
-    test();
 
     checkSubstitution();
 
