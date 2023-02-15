@@ -51,17 +51,24 @@ async function checkSupl() {
 
     await Promise.all([
         page.click('button.btn-login'),
-        page.waitForNavigation({ waitUntil: 'networkidle2' })
+        page.waitForNavigation({ waitUntil: 'networkidle2' }),
+        logger.info("Logged in")
+    ])
+
+    await Promise.all([
+        page.click('#c-p-bn'),
     ])
 
     //Get page data
     let data = await page.evaluate(() => document.querySelector('*').outerHTML);
+    console.log(data);
     let date = new Date();
 
     const timetable = await page.$('#main');        // logo is the element you want to capture
     await timetable.screenshot({
         path: 'timetable.png'
     });
+    logger.info("Took screenshot")
 
     if (date.getHours() == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
         previousCount = -1;
