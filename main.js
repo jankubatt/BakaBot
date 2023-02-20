@@ -2,6 +2,9 @@ const { Client, Intents, MessageAttachment, MessageEmbed } = require('discord.js
 const puppeteer = require('puppeteer');
 const dotenv = require('dotenv');
 dotenv.config();
+const cronitor = require('cronitor')(`${process.env.Cronitor}`);
+const monitor = new cronitor.Monitor('BakaBot');
+monitor.ping({message: 'Alive'});
 
 const { createLogger, format, transports } = require("winston");
 
