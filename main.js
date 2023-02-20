@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 const cronitor = require('cronitor')(`${process.env.Cronitor}`);
 const monitor = new cronitor.Monitor('BakaBot');
-monitor.ping({message: 'Alive'});
 
 const { createLogger, format, transports } = require("winston");
 
@@ -121,6 +120,8 @@ async function checkSupl() {
     previousCount = count;
 
     await browser.close();
+
+    monitor.ping({message: 'Alive'});
 }
 
 client.on('ready', () => {
