@@ -133,55 +133,55 @@ client.on('ready', () => {
     setInterval(() => {
         let date = new Date();
 
-        if (date.getHours() == 8 && date.getMinutes() == 0) {
-            checkSupl();
-        }
-        else if (date.getHours() == 8 && date.getMinutes() == 45) {
-            checkSupl();
-        }
-        else if (date.getHours() == 8 && date.getMinutes() == 55) {
-            checkSupl();
-        }
-        else if (date.getHours() == 9 && date.getMinutes() == 40) {
-            checkSupl();
-        }
-        else if (date.getHours() == 9 && date.getMinutes() == 50) {
-            checkSupl();
-        }
-        else if (date.getHours() == 10 && date.getMinutes() == 35) {
-            checkSupl();
-        }
-        else if (date.getHours() == 10 && date.getMinutes() == 50) {
-            checkSupl();
-        }
-        else if (date.getHours() == 11 && date.getMinutes() == 35) {
-            checkSupl();
-        }
-        else if (date.getHours() == 11 && date.getMinutes() == 45) {
-            checkSupl();
-        }
-        else if (date.getHours() == 12 && date.getMinutes() == 30) {
-            checkSupl();
-        }
-        else if (date.getHours() == 12 && date.getMinutes() == 40) {
-            checkSupl();
-        }
-        else if (date.getHours() == 13 && date.getMinutes() == 25) {
-            checkSupl();
-        }
-        else if (date.getHours() == 13 && date.getMinutes() == 35) {
-            checkSupl();
-        }
-        else if (date.getHours() == 14 && date.getMinutes() == 20) {
-            checkSupl();
+        if (date.getDay() >= 1 && date.getDay() <= 5) {
+            if (date.getHours() == 8 && date.getMinutes() == 0) {
+                checkSupl();
+            }
+            else if (date.getHours() == 8 && date.getMinutes() == 45) {
+                checkSupl();
+            }
+            else if (date.getHours() == 8 && date.getMinutes() == 55) {
+                checkSupl();
+            }
+            else if (date.getHours() == 9 && date.getMinutes() == 40) {
+                checkSupl();
+            }
+            else if (date.getHours() == 9 && date.getMinutes() == 50) {
+                checkSupl();
+            }
+            else if (date.getHours() == 10 && date.getMinutes() == 35) {
+                checkSupl();
+            }
+            else if (date.getHours() == 10 && date.getMinutes() == 50) {
+                checkSupl();
+            }
+            else if (date.getHours() == 11 && date.getMinutes() == 35) {
+                checkSupl();
+            }
+            else if (date.getHours() == 11 && date.getMinutes() == 45) {
+                checkSupl();
+            }
+            else if (date.getHours() == 12 && date.getMinutes() == 30) {
+                checkSupl();
+            }
+            else if (date.getHours() == 12 && date.getMinutes() == 40) {
+                checkSupl();
+            }
+            else if (date.getHours() == 13 && date.getMinutes() == 25) {
+                checkSupl();
+            }
+            else if (date.getHours() == 13 && date.getMinutes() == 35) {
+                checkSupl();
+            }
+            else if (date.getHours() == 14 && date.getMinutes() == 20) {
+                checkSupl();
+            }
         }
 
-    }, 1000 * 60 * 2.5)
-
-    //Interval for regular checking
-    setInterval(() => {
-        checkSupl();
-    }, 1000 * 60 * 10)
+        if (date.getHours() == 20 && date.getMinutes() == 0) { // Check if it's 20:00
+            checkSupl();
+        }
+    }, 1000 * 60 * 1)
 });
 
 client.on('messageCreate', (message) => {
