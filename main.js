@@ -2,8 +2,6 @@ const { Client, Intents, MessageAttachment, MessageEmbed } = require('discord.js
 const puppeteer = require('puppeteer');
 const dotenv = require('dotenv');
 dotenv.config();
-const cronitor = require('cronitor')(`${process.env.Cronitor}`);
-const monitor = new cronitor.Monitor('BakaBot');
 
 const { createLogger, format, transports } = require("winston");
 
@@ -120,8 +118,6 @@ async function checkSupl() {
     previousCount = count;
 
     await browser.close();
-
-    monitor.ping({message: 'Alive'});
 }
 
 client.on('ready', () => {
@@ -181,7 +177,7 @@ client.on('ready', () => {
         if (date.getHours() == 20 && date.getMinutes() == 0) { // Check if it's 20:00
             checkSupl();
         }
-    }, 1000 * 60 * 1)
+    }, 1000 * 60 * 2.5)
 });
 
 client.on('messageCreate', (message) => {
