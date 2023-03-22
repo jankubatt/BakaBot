@@ -38,7 +38,7 @@ const client = new Client({
 
 async function checkSupl() {
     logger.info("Checking substitutions");
-    const browser = await puppeteer.launch({defaultViewport: { width: 1920, height: 1080 }});
+    const browser = await puppeteer.launch({headless: true, defaultViewport: { width: 1920, height: 1080 }});
     const page = await browser.newPage();
     const url = BakaURL;
 
@@ -61,14 +61,7 @@ async function checkSupl() {
 
     //Get page data
     let data = await page.evaluate(() => document.querySelector('*').outerHTML);
-    console.log(data);
     let date = new Date();
-
-    const timetable = await page.$('#main');        // logo is the element you want to capture
-    await timetable.screenshot({
-        path: 'timetable.png'
-    });
-    logger.info("Took screenshot")
 
     if (date.getHours() == 0 && date.getDay() == 1) { //If it's midnight on Monday (Changing of timetables), reset previous count
         previousCount = -1;
@@ -77,7 +70,7 @@ async function checkSupl() {
     }
     else {
         logger.info("Processing data");
-        count = (data.match(/pink/g) || []).length; //count all substituted classes
+        count = data.split('pink').length - 1; 
 
         classes = "";
         data = data.split(/pink/g);
@@ -110,7 +103,8 @@ async function checkSupl() {
     if (count != previousCount && previousCount != -1) {
         logger.info("Sending message");
         const channel = client.channels.cache.get(ChannelID);
-        const file = new MessageAttachment('./timetable.png');
+        const file = await timetable.screenshot();
+        logger.info("Took screenshot")
         channel.send(`<@&${RoleID}>\nNové suplování bylo přidáno na Bakaláře`);
         channel.send({ files: [file] });
     }
@@ -128,60 +122,6 @@ client.on('ready', () => {
     setInterval(() => {
         checkSupl();
     }, 1000 * 60 * 60)
-
-    // //Interval for break checking (Edit this, if you have different times of breaks in school)
-    // setInterval(() => {
-    //     let date = new Date();
-
-    //     if (date.getDay() >= 1 && date.getDay() <= 5) {
-    //         if (date.getHours() == 8 && date.getMinutes() == 0) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 8 && date.getMinutes() == 45) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 8 && date.getMinutes() == 55) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 9 && date.getMinutes() == 40) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 9 && date.getMinutes() == 50) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 10 && date.getMinutes() == 35) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 10 && date.getMinutes() == 50) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 11 && date.getMinutes() == 35) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 11 && date.getMinutes() == 45) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 12 && date.getMinutes() == 30) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 12 && date.getMinutes() == 40) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 13 && date.getMinutes() == 25) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 13 && date.getMinutes() == 35) {
-    //             checkSupl();
-    //         }
-    //         else if (date.getHours() == 14 && date.getMinutes() == 20) {
-    //             checkSupl();
-    //         }
-    //     }
-
-    //     if (date.getHours() == 20 && date.getMinutes() == 0) { // Check if it's 20:00
-    //         checkSupl();
-    //     }
-    // }, 1000 * 60 * 2.5)
 });
 
 client.on('messageCreate', (message) => {
