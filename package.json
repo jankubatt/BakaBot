@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/jankubatt/BakaBot#readme",
   "dependencies": {
-    "cronitor": "^2.3.3",
+    "cronitor": "^2.3.5",
     "discord.js": "^13.3.1",
     "dotenv": "^16.0.0",
     "puppeteer": "^13.1.3",
